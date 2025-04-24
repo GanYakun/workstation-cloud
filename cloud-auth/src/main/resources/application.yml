@@ -1,0 +1,24 @@
+login-page-url: http://localhost:3001
+allowed-origins: http://localhost:3001, http://localhost:3000
+allowed-methods: GET,POST,PUT,DELETE
+logging:
+  level:
+    org.springframework.security: debug
+server:
+  port: 8083
+  servlet:
+    context-path: /auth
+spring:
+  application:
+    name: cloud-auth
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/human_resources_db?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+

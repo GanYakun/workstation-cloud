@@ -1,0 +1,43 @@
+server:
+  port: 10010
+logging:
+  level:
+    org.springframework.gateway: debug
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: 3713ee30-83c9-4625-a734-3179c87179e8
+      config:
+        file-extension: yaml
+        namespace: 3713ee30-83c9-4625-a734-3179c87179e8
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - 'http://localhost:3001'
+            allowed-methods:
+              - "GET"
+              - "POST"
+              - "PUT"
+              - "DELETE"
+              - "OPTIONS"
+            allowed-headers: "*"
+            allow-credentials: true
+      routes:
+        - id: cloud-system
+          uri: lb://cloud-system
+          predicates:
+            - Path=/system/**
+        - id: cloud-auth
+          uri: lb://cloud-auth
+          predicates:
+            - Path=/auth/**
+        - id: feign-api
+          uri: lb://feign-api
+          predicates:
+            - Path=/feign-api/**

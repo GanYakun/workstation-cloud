@@ -1,0 +1,16 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /feign-api
+spring:
+  application:
+    name: feign-api
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: d44d879f-ed73-4eaf-bc28-33cd9e8c1f78
+      config:
+        file-extension: yaml
+        namespace: d44d879f-ed73-4eaf-bc28-33cd9e8c1f78
+
