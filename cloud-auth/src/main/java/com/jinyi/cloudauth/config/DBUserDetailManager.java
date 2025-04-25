@@ -3,7 +3,6 @@ package com.jinyi.cloudauth.config;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jinyi.cloudauth.entity.UserLogin;
 import com.jinyi.cloudauth.mapper.UserMapper;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,7 +32,15 @@ public class DBUserDetailManager implements UserDetailsManager, UserDetailsPassw
         userLogin.setUserLoginId(userDetails.getUsername());
         userLogin.setCurrentPassword(userDetails.getPassword());
         userLogin.setEnabled(true);
-        userMapper.insert(userLogin);
+        UserLogin existUser = userFindByUserLoginId(userDetails.getUsername());
+        if (existUser != null) {
+            throw new RuntimeException("用户已存在");
+        }
+        try {
+            userMapper.insert(userLogin);
+        } catch (Exception e) {
+            throw new RuntimeException("用户插入失败: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -58,14 +65,13 @@ public class DBUserDetailManager implements UserDetailsManager, UserDetailsPassw
 
     @Override
     public UserDetails loadUserByUsername(String userLoginId) throws UsernameNotFoundException {
-        QueryWrapper<UserLogin> QueryWrapper = new QueryWrapper<>();
-        QueryWrapper.eq("user_login_id", userLoginId);
-        UserLogin userLogin = userMapper.selectOne(QueryWrapper);
+        UserLogin userLogin = userFindByUserLoginId(userLoginId);
         if (userLogin == null) {
             throw new UsernameNotFoundException("用户不存在");
         } else {
             Collection<GrantedAuthority> authorities = new ArrayList<>();
-            return new User(userLogin.getUserLoginId(),
+            return new User (
+                    userLogin.getUserLoginId(),
                     userLogin.getCurrentPassword(),
                     true,
                     true,
@@ -74,5 +80,11 @@ public class DBUserDetailManager implements UserDetailsManager, UserDetailsPassw
                     authorities
                    );
         }
+    }
+
+    private UserLogin userFindByUserLoginId(String userLoginId) {
+        QueryWrapper<UserLogin> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_login_id", userLoginId);
+        return userMapper.selectOne(queryWrapper);
     }
 }

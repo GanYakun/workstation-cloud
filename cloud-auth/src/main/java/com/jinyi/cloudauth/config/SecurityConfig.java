@@ -1,14 +1,13 @@
 package com.jinyi.cloudauth.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -23,9 +22,11 @@ import java.util.Collections;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
+    @Autowired
+    private DBUserDetailManager userDetailsService;
+
     @Value("${login-page-url}")
     private String loginPage;
-
 
     @Value("${allowed-origins}")
     private String[] allowedOrigins;
@@ -39,7 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         http
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("/auth/test").permitAll()
+                // 放行请求（配置的时候不能加auth路径）
+                .antMatchers("/test").permitAll()
+                .antMatchers("/add").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout().permitAll()
@@ -54,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
