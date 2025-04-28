@@ -40,5 +40,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserLogin> implemen
                 .authorities(authorities)
                 .build();
         dbUserDetailManager.createUser(userDetails);
+
     }
 }
